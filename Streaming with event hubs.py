@@ -49,7 +49,28 @@ except:
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ###Secrets
 
+# COMMAND ----------
+
+connectionStringEH= dbutils.secrets.get(scope='dbx-secrets-202405',key="connectionStringEH")
+eventHub = dbutils.secrets.get(scope='dbx-secrets-202405',key="eventHubName")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###Config
+
+# COMMAND ----------
+
+connectionString = connectionStringEH
+eventHubName = eventHub
+
+ehConf = {
+  'eventhubs.connectionString' : sc._jvm.org.apache.spark.eventhubs.EventHubsUtils.encrypt(connectionString),
+  'eventhubs.eventHubName': eventHubName
+}
 
 # COMMAND ----------
 
