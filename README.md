@@ -10,7 +10,10 @@ Welcome to the "Real-Time Streaming with Azure Databricks" repository. This proj
 ## Project content : Real-time Data Processing with Azure Databricks (and Event Hubs)
 
 This notebook demonstrates the below architecture to build real-time data pipelines.
-![Solution Architecture](https://raw.githubusercontent.com/malvik01/Real-Time-Streaming-with-Azure-Databricks/main/Azure%20Solution%20Architecture.png)
+<h3>
+  <img src="Azure Solution Architecture.png" alt="image">
+</h3>
+
 
 
 - Data Sources: Streaming data from IoT devices or social media feeds. (Simulated in Event Hubs)
