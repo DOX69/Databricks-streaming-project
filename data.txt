@@ -5,6 +5,14 @@
     "windDirection": "NW",
     "precipitation": 0,
     "conditions": "Partly Cloudy"
-}
+},
+{
+    "temperature": 22,
+    "humidity": 46,
+    "windSpeed": 12,
+    "windDirection": "NE",
+    "precipitation": 0,
+    "conditions": "Sunny"
+},
 
 
