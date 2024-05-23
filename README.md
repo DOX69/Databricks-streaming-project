@@ -23,7 +23,7 @@ This notebook demonstrates the below architecture to build real-time data pipeli
 - Visualisation: Data visualized using Power BI.
 
 
-### Azure Services Required
+### Azure Services
 - Databricks Workspace (Unity Catalog enabled)
 - Azure Data Lake Storage (Premium)
 - Azure Event Hub (Basic Tier)
@@ -31,3 +31,6 @@ This notebook demonstrates the below architecture to build real-time data pipeli
 ### Azure Databricks Configuration Required
 - Single Node Compute Cluster: `12.2 LTS (includes Apache Spark 3.3.2, Scala 2.12)`
 - Maven Library installed on Compute Cluster: `com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.22`
+
+### Medallion architecture
+- The 'weather' table in the 'bronze' schema of the 'streaming' catalog contains data related to weather events. It includes information such as the body of the event, the partition and offset values, the sequence number, the time the event was enqueued, the publisher, the partition key, and various properties and system properties associated with the event.
