@@ -84,8 +84,8 @@ ehConf = {
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC use schema bronze
+# %sql
+# use schema bronze
 
 # COMMAND ----------
 
@@ -102,7 +102,7 @@ bronze.display()
 
 # COMMAND ----------
 
-bronze.writeStream.option("checkpointLocation","/mnt/streaming/bronze/weather").outputMode("append").format("delta").toTable("weather")
+bronze.writeStream.option("checkpointLocation","/mnt/streaming/bronze/weather").outputMode("append").format("delta").toTable("bronze.weather")
 
 # COMMAND ----------
 
@@ -157,3 +157,7 @@ silver.writeStream\
   .outputMode("append")\
   .format("delta")\
   .toTable("silver.weather")
+
+# COMMAND ----------
+
+silver.display()
