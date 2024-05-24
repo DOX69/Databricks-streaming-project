@@ -103,3 +103,57 @@ bronze.display()
 # COMMAND ----------
 
 bronze.writeStream.option("checkpointLocation","/mnt/streaming/bronze/weather").outputMode("append").format("delta").toTable("weather")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #Silver
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##Define schema
+
+# COMMAND ----------
+
+silver_schema = StructType([
+    StructField("temperature",IntegerType(),False),
+    StructField("humidity",IntegerType(),False),
+    StructField("windSpeed",IntegerType(),False),
+    StructField("windDirection",StringType(),False),
+    StructField("precipitation",IntegerType(),False),
+    StructField("conditions",StructType(),False)
+])
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##Read bronze and transform into tabulated data
+
+# COMMAND ----------
+
+silver = spark.readStream\
+    .format("delta")\
+    .table("bronze.weather")\
+    .withColumn("body",col("body").cast('string'))\
+    .withColumn("json_body",from_json("body",json_schema))\
+    .selectExpr("cast(body:temperature as int) as temperature",
+                "cast(body:humidity as int) humidity",
+                "cast(body:windSpeed as int) windSpeed",
+                "cast(body:windDirection as string) windDirection",
+                "cast(body:precipitation as int) precipitation",
+                "cast(body:conditions as string) conditions",
+                "now() as ingest_timestamp")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##Write stream data in a db
+
+# COMMAND ----------
+
+silver.writeStream\
+  .option("checkpointlocation","/mnt/streaming/silver/weather")\
+  .outputMode("append")\
+  .format("delta")\
+  .toTable("silver.weather")
