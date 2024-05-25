@@ -217,7 +217,8 @@ spark.readStream.table("silver.weather").display()
 
 # COMMAND ----------
 
-spark.readStream.table("gold.weather_summary").display()    
+# MAGIC %sql
+# MAGIC select * from gold.weather_summary
 
 # COMMAND ----------
 
@@ -242,3 +243,8 @@ spark.readStream.table("gold.weather_summary").display()
 # MAGIC window.end as endWindow,
 # MAGIC * except(window)
 # MAGIC from gold.summary_weather_clone
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC drop table gold.summary_weather_clone
