@@ -84,8 +84,8 @@ ehConf = {
 
 # COMMAND ----------
 
-# %sql
-# use schema bronze
+# MAGIC %sql
+# MAGIC use schema bronze
 
 # COMMAND ----------
 
@@ -93,7 +93,7 @@ bronze = spark.readStream.format("eventhubs").options(**ehConf).load()
 
 # COMMAND ----------
 
-bronze.display()
+# bronze.display()
 
 # COMMAND ----------
 
@@ -136,7 +136,7 @@ silver = spark.readStream\
     .format("delta")\
     .table("bronze.weather")\
     .withColumn("body",col("body").cast('string'))\
-    .withColumn("json_body",from_json("body",json_schema))\
+    .withColumn("json_body",from_json("body",silver_schema))\
     .selectExpr("cast(body:temperature as int) as temperature",
                 "cast(body:humidity as int) humidity",
                 "cast(body:windSpeed as int) windSpeed",
@@ -160,4 +160,60 @@ silver.writeStream\
 
 # COMMAND ----------
 
-silver.display()
+# MAGIC %md
+# MAGIC #Gold
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Reading
+# MAGIC > Watermark 5 min
+
+# COMMAND ----------
+
+gold = spark.readStream\
+    .format('delta')\
+    .table('silver.weather')\
+    .withWatermark('ingest_timestamp','5 minutes')
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Aggregation
+# MAGIC > group by window 5 min
+# MAGIC
+# MAGIC > avg temperature,humidity,windSpeed, precipitation
+
+# COMMAND ----------
+
+gold_agg = gold.groupBy(window("ingest_timestamp", "5 minutes"))\
+    .agg(avg("temperature").alias("avg_temperature"),
+         stddev("humidity").alias("stddev_humidity"),
+         min("windSpeed").alias("min_humidity"),
+         max("precipitation").alias("max_precipitation"))
+         
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##Write
+
+# COMMAND ----------
+
+gold_agg.writeStream\
+    .option("checkpointlocation","/mnt/streaming/weather_summary")\
+    .outputMode("append")\
+    .format("delta")\
+    .toTable("gold.weather_summary")
+
+# COMMAND ----------
+
+spark.readStream.table("bronze.weather").display()
+
+# COMMAND ----------
+
+spark.readStream.table("silver.weather").display()
+
+# COMMAND ----------
+
+spark.readStream.table("gold.weather_summary").display()    
