@@ -34,3 +34,7 @@ This notebook demonstrates the below architecture to build real-time data pipeli
 
 ### Medallion architecture
 - The 'weather' table in the 'bronze' schema of the 'streaming' catalog contains data related to weather events. It includes information such as the body of the event, the partition and offset values, the sequence number, the time the event was enqueued, the publisher, the partition key, and various properties and system properties associated with the event.
+- In the gold layer, I create a streaming aggregate table with a watermark and a window of 5 min
+<h3>
+  <img src="watermark.png" alt="image">
+</h3>
