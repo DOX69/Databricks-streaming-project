@@ -190,8 +190,9 @@ gold_agg = gold.groupBy(window("ingest_timestamp", "5 minutes"))\
     .agg(avg("temperature").alias("avg_temperature"),
          stddev("humidity").alias("stddev_humidity"),
          min("windSpeed").alias("min_humidity"),
-         max("precipitation").alias("max_precipitation"))
-         
+         max("precipitation").alias("max_precipitation"))\
+    .selectExpr("window.start as startWindow","window.end endWindow","avg_temperature","stddev_humidity","min_humidity","max_precipitation")
+    
 
 # COMMAND ----------
 
@@ -216,4 +217,34 @@ spark.readStream.table("silver.weather").display()
 
 # COMMAND ----------
 
-spark.readStream.table("gold.weather_summary").display()    
+# MAGIC %sql
+# MAGIC select * from gold.weather_summary
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #Gold layer correction
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC create table gold.summary_weather_clone as select * from gold.weather_summary
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC drop table gold.weather_summary
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC create table gold.weather_summary as 
+# MAGIC select window.start as startWindow,
+# MAGIC window.end as endWindow,
+# MAGIC * except(window)
+# MAGIC from gold.summary_weather_clone
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC drop table gold.summary_weather_clone
